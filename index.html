@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>GarageTrack — Sigue tu Reparación en Tiempo Real</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*{font-family:'Inter',sans-serif}
+body{background:#09090b;color:#f0f0f0}
+.glass{background:rgba(255,255,255,0.03);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.07)}
+.accent{color:#3b82f6}
+.accent-bg{background:#3b82f6}
+.btn-primary{background:#3b82f6;color:#fff;font-weight:700;transition:all .2s;border-radius:12px;padding:14px 28px}
+.btn-primary:hover{background:#2563eb;transform:translateY(-2px);box-shadow:0 8px 25px rgba(59,130,246,.4)}
+.card{background:#111;border:1px solid #1f1f1f;border-radius:20px;transition:all .3s}
+input,select,textarea{background:#111;border:1px solid #2a2a2a;color:#f0f0f0;border-radius:10px;padding:12px 16px;width:100%;outline:none;transition:border .2s}
+input:focus,select:focus,textarea:focus{border-color:#3b82f6}
+select option{background:#111}
+.step-item{position:relative;padding-left:40px;padding-bottom:28px}
+.step-item::before{content:'';position:absolute;left:13px;top:26px;bottom:0;width:2px;background:#1f1f1f}
+.step-item:last-child::before{display:none}
+.step-dot{position:absolute;left:0;top:4px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.step-done .step-dot{background:#166534;border:2px solid #16a34a;color:#4ade80}
+.step-active .step-dot{background:#1e3a8a;border:2px solid #3b82f6;color:#93c5fd;box-shadow:0 0 15px rgba(59,130,246,.5)}
+.step-pending .step-dot{background:#1f1f1f;border:2px solid #333;color:#555}
+.status-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600}
+@keyframes ping2{0%{transform:scale(1);opacity:1}100%{transform:scale(1.6);opacity:0}}
+.ping{animation:ping2 1.5s ease-out infinite}
+.estimate-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1f1f1f}
+.estimate-row:last-child{border-bottom:none}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="fixed top-0 w-full z-50 glass border-b border-white/5">
+  <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 accent-bg rounded-lg flex items-center justify-center font-black text-white text-sm">GT</div>
+      <span class="font-bold text-lg">GarageTrack</span>
+    </div>
+    <div class="hidden md:flex items-center gap-8 text-sm text-gray-400">
+      <a href="#tracker" class="hover:text-white transition">Seguir mi coche</a>
+      <a href="#presupuesto" class="hover:text-white transition">Presupuesto</a>
+      <a href="#cita" class="hover:text-white transition">Pedir cita</a>
+    </div>
+    <a href="#cita" class="btn-primary text-sm py-2 px-5">Pedir cita</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="relative min-h-[90vh] flex items-center overflow-hidden">
+  <div class="absolute inset-0">
+    <img src="img/hero.webp" class="w-full h-full object-cover opacity-25"/>
+    <div class="absolute inset-0 bg-gradient-to-r from-black via-black/85 to-transparent"></div>
+  </div>
+  <div class="relative max-w-6xl mx-auto px-6 pt-24">
+    <div class="inline-flex items-center gap-2 bg-blue-950/60 border border-blue-900/50 rounded-full px-4 py-2 text-sm text-blue-400 mb-6">
+      <span class="relative flex h-2 w-2"><span class="ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span></span>
+      Taller abierto · 8:00–19:00 · 3 vehículos en reparación
+    </div>
+    <h1 class="text-5xl md:text-7xl font-black leading-tight">¿Cómo va<br/><span class="accent">tu coche?</span></h1>
+    <p class="text-gray-400 mt-6 text-xl max-w-xl leading-relaxed">Sigue el estado de tu reparación en tiempo real. Sin llamadas, sin incertidumbre. Te avisamos en cada paso.</p>
+    <div class="flex flex-wrap gap-4 mt-10">
+      <a href="#tracker" class="btn-primary text-base">Seguir mi coche →</a>
+      <a href="#presupuesto" class="glass text-white font-semibold rounded-xl px-7 py-4 border border-white/10 hover:border-blue-500/50 transition text-sm">Pedir presupuesto</a>
+    </div>
+  </div>
+</section>
+
+<!-- TRACKER -->
+<section id="tracker" class="max-w-6xl mx-auto px-6 py-24">
+  <div class="grid md:grid-cols-2 gap-12">
+
+    <!-- Buscador -->
+    <div class="card p-8">
+      <h2 class="text-2xl font-bold mb-2">Seguimiento de vehículo</h2>
+      <p class="text-gray-500 text-sm mb-8">Introduce tu matrícula o el código que te dimos al entregar el vehículo.</p>
+
+      <div class="space-y-4 mb-6">
+        <input id="plate-input" type="text" placeholder="Matrícula · Ej: 1234 ABC" class="font-mono uppercase text-lg text-center" oninput="this.value=this.value.toUpperCase()"/>
+        <p class="text-center text-gray-600 text-xs">— o —</p>
+        <input id="code-input" type="text" placeholder="Código de entrada · Ej: GT-8821" class="font-mono uppercase text-center" oninput="this.value=this.value.toUpperCase()"/>
+        <button onclick="trackVehicle()" class="btn-primary w-full text-center">🔍 Buscar vehículo</button>
+      </div>
+
+      <div id="tracker-result" class="hidden">
+        <div class="glass rounded-xl p-5 mb-6">
+          <div class="flex items-start justify-between mb-3">
+            <div>
+              <p class="text-2xl font-black font-mono" id="t-plate">1234 ABC</p>
+              <p class="text-gray-400 text-sm" id="t-model">BMW Serie 3 · 2019</p>
+            </div>
+            <span class="status-badge bg-blue-950 border border-blue-900 text-blue-400" id="t-status">
+              <span class="w-2 h-2 bg-blue-400 rounded-full"></span> En reparación
+            </span>
+          </div>
+          <div class="grid grid-cols-2 gap-3 text-sm">
+            <div class="glass rounded-lg p-3"><p class="text-gray-500 text-xs mb-1">Mecánico asignado</p><p class="font-semibold" id="t-mech">Javier P.</p></div>
+            <div class="glass rounded-lg p-3"><p class="text-gray-500 text-xs mb-1">Entrega estimada</p><p class="font-semibold" id="t-eta">Hoy 17:30</p></div>
+          </div>
+        </div>
+
+        <!-- Timeline -->
+        <div id="repair-timeline">
+          <div class="step-item step-done">
+            <div class="step-dot">✓</div>
+            <p class="font-semibold text-sm">Vehículo recibido</p>
+            <p class="text-xs text-gray-500">Hoy 08:45 · Kilometraje: 87.432 km</p>
+          </div>
+          <div class="step-item step-done">
+            <div class="step-dot">✓</div>
+            <p class="font-semibold text-sm">Diagnóstico completado</p>
+            <p class="text-xs text-gray-500">Hoy 09:30 · Pastillas delanteras + aceite</p>
+          </div>
+          <div class="step-item step-active">
+            <div class="step-dot">⚙</div>
+            <p class="font-semibold text-sm text-blue-400">Reparación en curso</p>
+            <p class="text-xs text-gray-500">Javier P. · Sustitución de frenos</p>
+          </div>
+          <div class="step-item step-pending">
+            <div class="step-dot">4</div>
+            <p class="font-semibold text-sm text-gray-600">Control de calidad</p>
+            <p class="text-xs text-gray-600">Pendiente</p>
+          </div>
+          <div class="step-item step-pending">
+            <div class="step-dot">5</div>
+            <p class="font-semibold text-sm text-gray-600">Listo para recoger</p>
+            <p class="text-xs text-gray-600">Te avisaremos por SMS/WhatsApp</p>
+          </div>
+        </div>
+
+        <div class="glass rounded-xl p-4 mt-4">
+          <p class="text-xs text-gray-500 mb-2 font-semibold uppercase tracking-wider">Actualización del mecánico</p>
+          <p class="text-sm text-gray-300">"Frenos delanteros cambiados. Procedemos con el cambio de aceite. Listo en ~1h."</p>
+          <p class="text-xs text-gray-600 mt-2">— Javier P. · hace 23 min</p>
+        </div>
+      </div>
+
+      <div id="tracker-demo" class="text-center py-8">
+        <p class="text-gray-500 text-sm">Prueba con matrícula <span class="accent font-mono font-bold cursor-pointer" onclick="document.getElementById('plate-input').value='1234 ABC';trackVehicle()">1234 ABC</span></p>
+      </div>
+    </div>
+
+    <!-- Presupuestador -->
+    <div id="presupuesto" class="card p-8">
+      <h2 class="text-2xl font-bold mb-2">Presupuesto online</h2>
+      <p class="text-gray-500 text-sm mb-8">Selecciona los trabajos que necesitas y obtén una estimación al instante.</p>
+
+      <div class="space-y-3 mb-6" id="repair-checkboxes">
+        <label class="flex items-center justify-between p-4 glass rounded-xl cursor-pointer hover:border-blue-500/30 transition">
+          <div class="flex items-center gap-3">
+            <input type="checkbox" class="repair-check accent-bg" data-price="120" onchange="calcEstimate()"/>
+            <div><p class="font-semibold text-sm">Cambio de aceite + filtro</p><p class="text-xs text-gray-500">Con aceite sintético 5W-40</p></div>
+          </div>
+          <span class="text-sm font-bold accent">~120€</span>
+        </label>
+        <label class="flex items-center justify-between p-4 glass rounded-xl cursor-pointer hover:border-blue-500/30 transition">
+          <div class="flex items-center gap-3">
+            <input type="checkbox" class="repair-check" data-price="280" onchange="calcEstimate()"/>
+            <div><p class="font-semibold text-sm">Pastillas de freno (eje delantero)</p><p class="text-xs text-gray-500">Incluye discos si necesario</p></div>
+          </div>
+          <span class="text-sm font-bold accent">~280€</span>
+        </label>
+        <label class="flex items-center justify-between p-4 glass rounded-xl cursor-pointer hover:border-blue-500/30 transition">
+          <div class="flex items-center gap-3">
+            <input type="checkbox" class="repair-check" data-price="90" onchange="calcEstimate()"/>
+            <div><p class="font-semibold text-sm">Filtro de aire + habitáculo</p><p class="text-xs text-gray-500">Recomendado cada 15.000 km</p></div>
+          </div>
+          <span class="text-sm font-bold accent">~90€</span>
+        </label>
+        <label class="flex items-center justify-between p-4 glass rounded-xl cursor-pointer hover:border-blue-500/30 transition">
+          <div class="flex items-center gap-3">
+            <input type="checkbox" class="repair-check" data-price="350" onchange="calcEstimate()"/>
+            <div><p class="font-semibold text-sm">Correa de distribución</p><p class="text-xs text-gray-500">Obligatorio cada 80.000 km</p></div>
+          </div>
+          <span class="text-sm font-bold accent">~350€</span>
+        </label>
+        <label class="flex items-center justify-between p-4 glass rounded-xl cursor-pointer hover:border-blue-500/30 transition">
+          <div class="flex items-center gap-3">
+            <input type="checkbox" class="repair-check" data-price="55" onchange="calcEstimate()"/>
+            <div><p class="font-semibold text-sm">Diagnóstico electrónico (OBD)</p><p class="text-xs text-gray-500">Lectura de errores y sensores</p></div>
+          </div>
+          <span class="text-sm font-bold accent">~55€</span>
+        </label>
+        <label class="flex items-center justify-between p-4 glass rounded-xl cursor-pointer hover:border-blue-500/30 transition">
+          <div class="flex items-center gap-3">
+            <input type="checkbox" class="repair-check" data-price="180" onchange="calcEstimate()"/>
+            <div><p class="font-semibold text-sm">Neumáticos (x4, montaje incluido)</p><p class="text-xs text-gray-500">Precio orientativo por eje</p></div>
+          </div>
+          <span class="text-sm font-bold accent">~180€/eje</span>
+        </label>
+      </div>
+
+      <div class="glass rounded-xl p-5">
+        <div class="estimate-row">
+          <span class="text-gray-400 text-sm">Subtotal trabajos</span>
+          <span class="font-bold" id="est-sub">0€</span>
+        </div>
+        <div class="estimate-row">
+          <span class="text-gray-400 text-sm">Mano de obra estimada</span>
+          <span class="font-bold" id="est-labor">0€</span>
+        </div>
+        <div class="estimate-row">
+          <span class="text-gray-400 text-sm">IVA (21%)</span>
+          <span class="font-bold" id="est-iva">0€</span>
+        </div>
+        <div class="flex justify-between items-center mt-3 pt-3 border-t border-white/10">
+          <span class="font-bold">TOTAL ESTIMADO</span>
+          <span class="text-2xl font-black accent" id="est-total">0€</span>
+        </div>
+        <p class="text-xs text-gray-600 mt-3">* Presupuesto orientativo. El precio final se confirma tras diagnóstico en taller.</p>
+      </div>
+
+      <button onclick="requestQuote()" class="btn-primary w-full mt-5 text-center">Solicitar presupuesto oficial</button>
+      <div id="quote-ok" class="hidden glass rounded-xl p-4 mt-3 text-center text-sm text-green-400">✅ Solicitud enviada. Te contactamos en &lt;1 hora.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PEDIR CITA -->
+<section id="cita" class="max-w-4xl mx-auto px-6 py-16">
+  <div class="card p-10 text-center">
+    <h2 class="text-3xl font-bold mb-3">Pide tu cita online</h2>
+    <p class="text-gray-400 mb-8">Sin esperas. Tu vehículo recibido en el horario que elijas.</p>
+    <div class="grid sm:grid-cols-3 gap-4 max-w-2xl mx-auto mb-6">
+      <input type="text" placeholder="Nombre" />
+      <input type="tel" placeholder="Teléfono" />
+      <input type="text" placeholder="Matrícula" class="font-mono uppercase" />
+    </div>
+    <div class="grid sm:grid-cols-2 gap-4 max-w-2xl mx-auto mb-6">
+      <input type="date" />
+      <select><option>8:00 – 10:00</option><option>10:00 – 12:00</option><option>12:00 – 14:00</option><option>16:00 – 18:00</option></select>
+    </div>
+    <textarea placeholder="Describe el problema de tu vehículo (opcional)" rows="3" class="max-w-2xl mx-auto mb-6"></textarea>
+    <button onclick="this.textContent='✅ Cita confirmada. Te llamamos para confirmar.';this.disabled=true;this.style.background='#166534'" class="btn-primary text-base px-10">Confirmar cita</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="border-t border-white/5 py-10 text-center text-gray-600 text-sm">
+  <p class="font-bold text-white mb-1">GarageTrack</p>
+  <p>Polígono Industrial Norte, Nave 7 · Lun–Vie 8:00–19:00 · Sáb 9:00–14:00</p>
+  <p class="mt-2">Desarrollado por <span class="accent font-semibold">PuntoZero Solutions</span></p>
+</footer>
+
+<script>
+function trackVehicle(){
+  document.getElementById('tracker-demo').classList.add('hidden');
+  document.getElementById('tracker-result').classList.remove('hidden');
+  const p = document.getElementById('plate-input').value || document.getElementById('code-input').value;
+  if(p) document.getElementById('t-plate').textContent = p;
+}
+function calcEstimate(){
+  let sub = 0;
+  document.querySelectorAll('.repair-check:checked').forEach(c=>sub+=parseInt(c.dataset.price));
+  const labor = Math.round(sub*0.15);
+  const total = sub + labor;
+  const iva = Math.round(total*0.21);
+  document.getElementById('est-sub').textContent = sub+'€';
+  document.getElementById('est-labor').textContent = labor+'€';
+  document.getElementById('est-iva').textContent = iva+'€';
+  document.getElementById('est-total').textContent = (total+iva)+'€';
+}
+function requestQuote(){
+  document.getElementById('quote-ok').classList.remove('hidden');
+}
+</script>
+</body>
+</html>
